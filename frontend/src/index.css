@@ -13,9 +13,36 @@ body {
   -webkit-font-smoothing: antialiased;
   font-size: 15px;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Hero image cells */
+.hero-cell:hover img {
+  transform: scale(1.05);
+}
+
+.hero-cell-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 14px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(10, 15, 25, 0);
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.25s ease;
+  line-height: 1.2;
+}
+
+.hero-cell:hover .hero-cell-label {
+  opacity: 1;
+  background: rgba(10, 15, 25, 0.55);
 }
