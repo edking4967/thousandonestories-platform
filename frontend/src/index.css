@@ -30,19 +30,36 @@ a {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-end;
-  padding: 12px 14px;
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 20px;
   background: rgba(10, 15, 25, 0);
   opacity: 0;
   transition: opacity 0.25s ease, background 0.25s ease;
-  line-height: 1.2;
 }
 
 .hero-cell:hover .hero-cell-label {
   opacity: 1;
-  background: rgba(10, 15, 25, 0.55);
+  background: rgba(10, 15, 25, 0.72);
+}
+
+.hero-cell-title {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.hero-cell-author {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.6rem, 1vw, 0.75rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }

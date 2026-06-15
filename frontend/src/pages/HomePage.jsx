@@ -5,14 +5,14 @@ import CommunityCard from '../components/CommunityCard'
 const COMMUNITY = 'thousandone-classic'
 
 const HERO_IMAGES = [
-  { id: '1635', ext: 'jpg', col: '1 / span 2', row: '1 / span 2', title: 'The Price of Knowing' },
-  { id: '1929', ext: 'jpg', col: '3',          row: '1',          title: 'Fireworks' },
-  { id: '2048', ext: 'jpg', col: '4',          row: '1',          title: 'The Melody Diner on Broadway' },
-  { id: '1805', ext: 'jpg', col: '3',          row: '2',          title: '1968' },
-  { id: '1870', ext: 'jpg', col: '4',          row: '2',          title: 'Chiclets in Columbus Circle' },
-  { id: '2121', ext: 'jpg', col: '1',          row: '3',          title: 'Soup Kitchen' },
-  { id: '908',  ext: 'jpg', col: '2',          row: '3',          title: 'Lycaon' },
-  { id: '1745', ext: 'jpg', col: '3 / span 2', row: '3',          title: 'Jigsaw Puzzle' },
+  { id: '1635', ext: 'jpg', col: '1 / span 2', row: '1 / span 2', title: 'The Price of Knowing',           author: 'Leah Sackett' },
+  { id: '1929', ext: 'jpg', col: '3',          row: '1',          title: 'Fireworks',                      author: 'Edward King' },
+  { id: '2048', ext: 'jpg', col: '4',          row: '1',          title: 'The Melody Diner on Broadway',   author: 'Romana Guillotte' },
+  { id: '1805', ext: 'jpg', col: '3',          row: '2',          title: '1968',                           author: 'DC Diamandopolous' },
+  { id: '1870', ext: 'jpg', col: '4',          row: '2',          title: 'Chiclets in Columbus Circle',    author: 'Mary Ellen Gambutti' },
+  { id: '2121', ext: 'jpg', col: '1',          row: '3',          title: 'Soup Kitchen',                   author: 'Louis Rive' },
+  { id: '908',  ext: 'jpg', col: '2',          row: '3',          title: 'Lycaon',                         author: 'Garret Schuelke' },
+  { id: '1745', ext: 'jpg', col: '3 / span 2', row: '3',          title: 'Jigsaw Puzzle',                  author: 'David Cannella' },
 ]
 
 export default function HomePage() {
@@ -44,7 +44,7 @@ export default function HomePage() {
         background: '#0f1923',
         overflow: 'hidden',
       }}>
-        {HERO_IMAGES.map(({ id, ext, col, row, title }) => (
+        {HERO_IMAGES.map(({ id, ext, col, row, title, author }) => (
           <Link
             key={id}
             to={`/c/${COMMUNITY}/s/og-${id}`}
@@ -64,7 +64,8 @@ export default function HomePage() {
               }}
             />
             <div className="hero-cell-label">
-              {title}
+              <span className="hero-cell-title">{title}</span>
+              <span className="hero-cell-author">by {author}</span>
             </div>
           </Link>
         ))}
