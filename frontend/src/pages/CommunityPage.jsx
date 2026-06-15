@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import SubscribeModal from '../components/SubscribeModal'
 import VoteButton from '../components/VoteButton'
 
-function StoryRow({ story, featured, communityId }) {
+function StoryRow({ story, featured, communityId, hideAuthors }) {
   return (
     <article style={{ borderBottom: '1px solid #e8ecf0', paddingTop: '28px', paddingBottom: '28px' }}>
       {featured && (
@@ -11,16 +11,23 @@ function StoryRow({ story, featured, communityId }) {
           Featured story
         </p>
       )}
-      <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, color: '#0f1923', lineHeight: 1.25, marginBottom: '6px', fontSize: featured ? '1.5rem' : '1.2rem' }}>
-        <Link to={`/c/${communityId}/s/${story.id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:underline">
-          {story.title}
-        </Link>
-      </h2>
-      <p style={{ fontSize: '13px', color: '#374151', lineHeight: 1.6, fontWeight: 300, marginBottom: '10px', maxWidth: '520px' }}>
-        {story.excerpt}
-      </p>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, color: '#0f1923', lineHeight: 1.25, marginBottom: '6px', fontSize: featured ? '1.5rem' : '1.2rem' }}>
+            <Link to={`/c/${communityId}/s/${story.id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:underline">
+              {story.title}
+            </Link>
+          </h2>
+          <p style={{ fontSize: '13px', color: '#374151', lineHeight: 1.6, fontWeight: 300, marginBottom: '10px', maxWidth: '520px' }}>
+            {story.excerpt}
+          </p>
+        </div>
+        {story.image_url && (
+          <img src={story.image_url} alt="" style={{ width: featured ? '140px' : '90px', height: featured ? '100px' : '65px', objectFit: 'cover', flexShrink: 0 }} />
+        )}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: '#64748b' }}>
-        <span style={{ fontWeight: 500, color: '#374151' }}>{story.author}</span>
+        {!hideAuthors && <span style={{ fontWeight: 500, color: '#374151' }}>{story.author}</span>}
         {story.word_count && <span>{story.word_count.toLocaleString()} words</span>}
         <span>{story.date_published}</span>
         <VoteButton communityId={communityId} storyId={story.id} initialVotes={story.votes} />
@@ -166,9 +173,9 @@ export default function CommunityPage() {
 
       {/* Stories */}
       <div>
-        {featured && <StoryRow story={featured} featured={true} communityId={id} />}
+        {featured && <StoryRow story={featured} featured={true} communityId={id} hideAuthors={community.hide_authors} />}
         {rest.map(story => (
-          <StoryRow key={story.id} story={story} featured={false} communityId={id} />
+          <StoryRow key={story.id} story={story} featured={false} communityId={id} hideAuthors={community.hide_authors} />
         ))}
       </div>
     </main>

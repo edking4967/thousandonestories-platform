@@ -5,6 +5,7 @@ backend/*.pyc
 backend/submissions.json
 backend/communities.json
 backend/stories.json
+backend/thousandone.db
 
 # Node
 frontend/node_modules/

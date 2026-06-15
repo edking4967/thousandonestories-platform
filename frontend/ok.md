@@ -1,1 +1,0 @@
-Basically, at its core, I am creating what I did with 1001 and making it distributed. Anyone can set up a publication. Writers theoretically bring readers. Readers who come to see John B stay to read Maya A. But with all these sites networked together, you *should* get a bigger pool of readers.

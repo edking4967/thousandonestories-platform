@@ -51,6 +51,9 @@ export default function StoryPage() {
 
       {/* Story header */}
       <div style={{ marginBottom: '36px', paddingBottom: '28px', borderBottom: '1px solid #e8ecf0' }}>
+        {story.image_url && (
+          <img src={story.image_url} alt="" style={{ width: '100%', maxHeight: '320px', objectFit: 'cover', display: 'block', marginBottom: '28px' }} />
+        )}
         <p style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#1c2b4a', paddingBottom: '5px', borderBottom: '1.5px solid #1c2b4a', display: 'inline-block', marginBottom: '16px' }}>
           {community.name}
         </p>
@@ -58,7 +61,7 @@ export default function StoryPage() {
           {story.title}
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#64748b' }}>
-          <span style={{ fontWeight: 500, color: '#374151' }}>{story.author}</span>
+          {!community.hide_authors && <span style={{ fontWeight: 500, color: '#374151' }}>{story.author}</span>}
           {story.word_count && <span>{story.word_count.toLocaleString()} words</span>}
           {story.date_published && <span>{story.date_published}</span>}
           {story.votes != null && <VoteButton communityId={communityId} storyId={storyId} initialVotes={story.votes} />}
@@ -67,9 +70,11 @@ export default function StoryPage() {
 
       {/* Story body */}
       <div style={{ maxWidth: '640px' }}>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.15rem', lineHeight: 1.8, color: '#1a1a1a', fontWeight: 400 }}>
-          {story.excerpt}
-        </p>
+        {(story.body ? story.body : story.excerpt).split('\n').filter(p => p.trim()).map((para, i) => (
+          <p key={i} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.15rem', lineHeight: 1.8, color: '#1a1a1a', fontWeight: 400, marginBottom: '1.4em' }}>
+            {para}
+          </p>
+        ))}
       </div>
     </main>
   )
