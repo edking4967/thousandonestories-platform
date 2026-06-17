@@ -44,6 +44,44 @@ a {
   background: rgba(10, 15, 25, 0.72);
 }
 
+/* Quote card — shown when a story has no image */
+.hero-quote-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px 22px;
+  background: #1a2638;
+  position: relative;
+}
+
+.hero-cell--quote:hover .hero-quote-card {
+  background: #1e2e42;
+}
+
+.hero-quote-mark {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 4rem;
+  line-height: 0.6;
+  color: rgba(255, 255, 255, 0.18);
+  margin-bottom: 10px;
+  user-select: none;
+}
+
+.hero-quote-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
 .hero-cell-title {
   display: block;
   font-family: 'Cormorant Garamond', Georgia, serif;

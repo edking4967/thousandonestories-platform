@@ -7,6 +7,8 @@ import StoryPage from './pages/StoryPage'
 import SubmitPage from './pages/SubmitPage'
 import NewCommunityPage from './pages/NewCommunityPage'
 import DashboardPage from './pages/DashboardPage'
+import DraftsPage from './pages/DraftsPage'
+import TagPage from './pages/TagPage'
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
           <Route path="/new-community" element={<NewCommunityPage />} />
           <Route path="/c/:id/dashboard" element={<DashboardPage />} />
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/drafts" element={<DraftsPage />} />
+          <Route path="/tag/:tag" element={<TagPage />} />
         </Routes>
       </div>
     </BrowserRouter>

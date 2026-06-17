@@ -1,11 +1,24 @@
-import { Link } from 'react-router-dom'
-
-const genres = ['Literary', 'Thriller', 'Humor', 'Mystery', 'Romance', 'Sci-Fi']
+import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Header() {
+  const [tags, setTags] = useState([])
+  const location = useLocation()
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/tags')
+      .then(r => r.json())
+      .then(data => setTags(data.slice(0, 10))) // cap at 10 tags in nav
+      .catch(() => {})
+  }, [])
+
+  const activeTag = location.pathname.startsWith('/tag/')
+    ? decodeURIComponent(location.pathname.slice(5))
+    : null
+
   return (
     <header style={{ borderBottom: '1.5px solid #1c2b4a', background: '#fff' }}>
-      {/* Top bar: logo + actions */}
+      {/* Top bar */}
       <div style={{ padding: '24px 40px 18px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <div>
           <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', fontWeight: 700, color: '#0f1923', lineHeight: 1, letterSpacing: '-0.5px', display: 'block' }}>
@@ -22,11 +35,28 @@ export default function Header() {
           <Link to="/signin" style={{ color: '#374151' }}>Sign in</Link>
         </div>
       </div>
-      {/* Genre nav */}
-      <div style={{ padding: '0 40px 14px', display: 'flex', alignItems: 'center', gap: '24px', fontSize: '12px', color: '#374151', overflowX: 'auto' }}>
-        <a href="#" style={{ fontWeight: 600, color: '#1c2b4a', whiteSpace: 'nowrap', letterSpacing: '0.05em' }}>Stories</a>
-        {genres.map(g => (
-          <a key={g} href="#" style={{ color: '#374151', whiteSpace: 'nowrap' }}>{g}</a>
+
+      {/* Tag nav */}
+      <div style={{ padding: '0 40px 14px', display: 'flex', alignItems: 'center', gap: '24px', fontSize: '12px', overflowX: 'auto' }}>
+        <Link
+          to="/"
+          style={{ fontWeight: 600, color: '#1c2b4a', whiteSpace: 'nowrap', letterSpacing: '0.05em', textDecoration: 'none' }}
+        >
+          Stories
+        </Link>
+        {tags.map(({ tag }) => (
+          <Link
+            key={tag}
+            to={`/tag/${encodeURIComponent(tag)}`}
+            style={{
+              whiteSpace: 'nowrap',
+              textDecoration: 'none',
+              color: activeTag === tag ? '#1c2b4a' : '#374151',
+              fontWeight: activeTag === tag ? 600 : 400,
+            }}
+          >
+            {tag.charAt(0).toUpperCase() + tag.slice(1)}
+          </Link>
         ))}
       </div>
     </header>

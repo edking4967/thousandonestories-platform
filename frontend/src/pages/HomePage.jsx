@@ -2,35 +2,37 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import CommunityCard from '../components/CommunityCard'
 
-const COMMUNITY = 'thousandone-classic'
-
-const HERO_IMAGES = [
-  { id: '1635', ext: 'jpg', col: '1 / span 2', row: '1 / span 2', title: 'The Price of Knowing',           author: 'Leah Sackett' },
-  { id: '1929', ext: 'jpg', col: '3',          row: '1',          title: 'Fireworks',                      author: 'Edward King' },
-  { id: '2048', ext: 'jpg', col: '4',          row: '1',          title: 'The Melody Diner on Broadway',   author: 'Romana Guillotte' },
-  { id: '1805', ext: 'jpg', col: '3',          row: '2',          title: '1968',                           author: 'DC Diamandopolous' },
-  { id: '1870', ext: 'jpg', col: '4',          row: '2',          title: 'Chiclets in Columbus Circle',    author: 'Mary Ellen Gambutti' },
-  { id: '2121', ext: 'jpg', col: '1',          row: '3',          title: 'Soup Kitchen',                   author: 'Louis Rive' },
-  { id: '908',  ext: 'jpg', col: '2',          row: '3',          title: 'Lycaon',                         author: 'Garret Schuelke' },
-  { id: '1745', ext: 'jpg', col: '3 / span 2', row: '3',          title: 'Jigsaw Puzzle',                  author: 'David Cannella' },
+// Fixed grid slot positions — shape never changes
+const SLOTS = [
+  { col: '1 / span 2', row: '1 / span 2' },
+  { col: '3',          row: '1'           },
+  { col: '4',          row: '1'           },
+  { col: '3',          row: '2'           },
+  { col: '4',          row: '2'           },
+  { col: '1',          row: '3'           },
+  { col: '2',          row: '3'           },
+  { col: '3 / span 2', row: '3'           },
 ]
 
 export default function HomePage() {
   const [communities, setCommunities] = useState([])
+  const [heroStories, setHeroStories] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/communities')
-      .then(r => r.json())
-      .then(data => {
-        setCommunities(data)
-        setLoading(false)
-      })
+    Promise.all([
+      fetch('http://localhost:8000/api/communities').then(r => r.json()),
+      fetch('http://localhost:8000/api/stories/recent?limit=8').then(r => r.json()),
+    ]).then(([comms, recent]) => {
+      setCommunities(comms)
+      setHeroStories(recent)
+      setLoading(false)
+    })
   }, [])
 
   return (
     <>
-      {/* Full-bleed image mosaic — breaks out of the 780px container */}
+      {/* Full-bleed image mosaic */}
       <div style={{
         width: '100vw',
         marginLeft: 'calc(50% - 50vw)',
@@ -44,16 +46,23 @@ export default function HomePage() {
         background: '#0f1923',
         overflow: 'hidden',
       }}>
-        {HERO_IMAGES.map(({ id, ext, col, row, title, author }) => (
-          <Link
-            key={id}
-            to={`/c/${COMMUNITY}/s/og-${id}`}
-            style={{ gridColumn: col, gridRow: row, overflow: 'hidden', display: 'block', position: 'relative' }}
-            className="hero-cell"
-          >
+        {SLOTS.map((slot, i) => {
+          const story = heroStories[i]
+
+          // Empty slot — dark placeholder
+          if (!story) {
+            return (
+              <div
+                key={i}
+                style={{ gridColumn: slot.col, gridRow: slot.row, background: '#0f1923' }}
+              />
+            )
+          }
+
+          const cellContent = story.image_url ? (
             <img
-              src={`/images/og/${id}.${ext}`}
-              alt={title}
+              src={story.image_url}
+              alt={story.title}
               style={{
                 width: '100%',
                 height: '100%',
@@ -63,14 +72,32 @@ export default function HomePage() {
                 transition: 'transform 0.35s ease',
               }}
             />
-            <div className="hero-cell-label">
-              <span className="hero-cell-title">{title}</span>
-              <span className="hero-cell-author">by {author}</span>
+          ) : (
+            <div className="hero-quote-card">
+              <span className="hero-quote-mark">&ldquo;</span>
+              <p className="hero-quote-text">{story.excerpt}</p>
             </div>
-          </Link>
-        ))}
+          )
 
-        {/* Dark gradient scrim — heavier at bottom so text pops */}
+          return (
+            <Link
+              key={story.id}
+              to={`/c/${story.community_id}/s/${story.id}`}
+              style={{ gridColumn: slot.col, gridRow: slot.row, overflow: 'hidden', display: 'block', position: 'relative' }}
+              className={`hero-cell${story.image_url ? '' : ' hero-cell--quote'}`}
+            >
+              {cellContent}
+              <div className="hero-cell-label">
+                <span className="hero-cell-title">{story.title}</span>
+                {story.author && (
+                  <span className="hero-cell-author">by {story.author}</span>
+                )}
+              </div>
+            </Link>
+          )
+        })}
+
+        {/* Gradient scrim */}
         <div style={{
           position: 'absolute',
           inset: 0,
@@ -79,7 +106,7 @@ export default function HomePage() {
           zIndex: 1,
         }} />
 
-        {/* Title text, bottom-left */}
+        {/* Site title */}
         <div style={{
           position: 'absolute',
           bottom: 0,

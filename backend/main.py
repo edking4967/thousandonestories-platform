@@ -32,6 +32,7 @@ def _story_dict(row: sqlite3.Row) -> dict:
         "featured": bool(row["featured"]),
         "votes": row["votes"],
         "image_url": row["image_url"],  # already NULL in DB when absent
+        "status": row["status"] if "status" in row.keys() else "published",
     }
 
 
@@ -73,14 +74,14 @@ def _community_row_to_full(row: sqlite3.Row, stories: list) -> dict:
 
 
 def _get_featured_story(conn: sqlite3.Connection, community_id: str):
-    """Return the featured story, or the most recent one if none is featured."""
+    """Return the featured story, or the most recent published one if none is featured."""
     row = conn.execute(
-        "SELECT * FROM stories WHERE community_id = ? AND featured = 1 LIMIT 1",
+        "SELECT * FROM stories WHERE community_id = ? AND featured = 1 AND status = 'published' LIMIT 1",
         (community_id,),
     ).fetchone()
     if row is None:
         row = conn.execute(
-            "SELECT * FROM stories WHERE community_id = ? ORDER BY date_published DESC LIMIT 1",
+            "SELECT * FROM stories WHERE community_id = ? AND status = 'published' ORDER BY date_published DESC LIMIT 1",
             (community_id,),
         ).fetchone()
     return _story_dict(row) if row else None
@@ -133,7 +134,7 @@ def get_community(community_id: str):
     stories = [
         _story_dict(s)
         for s in conn.execute(
-            "SELECT * FROM stories WHERE community_id = ? ORDER BY date_published DESC",
+            "SELECT * FROM stories WHERE community_id = ? AND status = 'published' ORDER BY date_published DESC",
             (community_id,),
         ).fetchall()
     ]
@@ -175,6 +176,152 @@ def create_community(body: NewCommunityRequest):
         "editor": {"name": body.editor_name, "bio": body.editor_bio},
         "stories": [],
     }
+
+
+# ---------- tags ----------
+
+@app.get("/api/tags")
+def get_tags():
+    """Return all tags in use on published stories, sorted by story count desc."""
+    conn = _get_conn()
+    rows = conn.execute(
+        "SELECT tags FROM stories WHERE status = 'published' AND tags != ''"
+    ).fetchall()
+    conn.close()
+    counts: dict[str, int] = {}
+    for row in rows:
+        for tag in row["tags"].split(","):
+            tag = tag.strip()
+            if tag:
+                counts[tag] = counts.get(tag, 0) + 1
+    return [{"tag": t, "count": c} for t, c in sorted(counts.items(), key=lambda x: -x[1])]
+
+
+@app.get("/api/stories/tag/{tag}")
+def get_stories_by_tag(tag: str):
+    """Return published stories that have the given tag, newest first."""
+    conn = _get_conn()
+    rows = conn.execute(
+        """
+        SELECT s.id, s.community_id, s.title, s.author, s.excerpt,
+               s.word_count, s.date_published, s.image_url, s.tags
+        FROM stories s
+        WHERE s.status = 'published'
+          AND s.tags != ''
+          AND (',' || s.tags || ',') LIKE ?
+        ORDER BY s.date_published DESC
+        """,
+        (f"%,{tag},%",),
+    ).fetchall()
+    conn.close()
+    return [
+        {
+            "id":             r["id"],
+            "community_id":   r["community_id"],
+            "title":          r["title"],
+            "author":         r["author"],
+            "excerpt":        r["excerpt"],
+            "word_count":     r["word_count"],
+            "date_published": r["date_published"],
+            "image_url":      r["image_url"],
+            "tags":           [t.strip() for t in r["tags"].split(",") if t.strip()],
+        }
+        for r in rows
+    ]
+
+
+# ---------- drafts admin ----------
+
+@app.get("/api/stories/drafts")
+def get_drafts(source: str = ""):
+    """
+    Return all draft stories, oldest-original-date first.
+    Optional ?source=og or ?source=cbr to filter by prefix.
+    """
+    conn = _get_conn()
+    if source:
+        rows = conn.execute(
+            "SELECT s.id, s.community_id, s.title, s.author, s.word_count, "
+            "       s.date_published, s.image_url "
+            "FROM stories s "
+            "WHERE s.status = 'draft' AND s.id LIKE ? "
+            "ORDER BY s.date_published ASC",
+            (f"{source}-%",),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT s.id, s.community_id, s.title, s.author, s.word_count, "
+            "       s.date_published, s.image_url "
+            "FROM stories s "
+            "WHERE s.status = 'draft' "
+            "ORDER BY s.date_published ASC",
+        ).fetchall()
+    conn.close()
+    return [
+        {
+            "id":             r["id"],
+            "community_id":   r["community_id"],
+            "title":          r["title"],
+            "author":         r["author"],
+            "word_count":     r["word_count"],
+            "date_published": r["date_published"],
+            "image_url":      r["image_url"],
+            "source":         "og" if r["id"].startswith("og-") else "cbr",
+        }
+        for r in rows
+    ]
+
+
+@app.post("/api/stories/{story_id}/publish")
+def publish_story(story_id: str):
+    """Immediately publish a single draft story."""
+    conn = _get_conn()
+    story = conn.execute(
+        "SELECT id, status FROM stories WHERE id = ?", (story_id,)
+    ).fetchone()
+    if not story:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Story not found")
+    if story["status"] != "draft":
+        conn.close()
+        raise HTTPException(status_code=400, detail="Story is not a draft")
+    conn.execute(
+        "UPDATE stories SET status = 'published', date_published = ? WHERE id = ?",
+        (date.today().isoformat(), story_id),
+    )
+    conn.commit()
+    conn.close()
+    return {"ok": True, "published_on": date.today().isoformat()}
+
+
+# ---------- recent stories (homepage grid) ----------
+
+@app.get("/api/stories/recent")
+def get_recent_stories(limit: int = 8):
+    conn = _get_conn()
+    rows = conn.execute(
+        """
+        SELECT s.id, s.community_id, s.title, s.author, s.excerpt, s.image_url, s.date_published
+        FROM stories s
+        WHERE s.status = 'published'
+        ORDER BY s.date_published DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+    conn.close()
+    return [
+        {
+            "id": r["id"],
+            "community_id": r["community_id"],
+            "title": r["title"],
+            "author": r["author"],
+            "excerpt": r["excerpt"],
+            "image_url": r["image_url"],
+            "date_published": r["date_published"],
+        }
+        for r in rows
+    ]
 
 
 # ---------- votes ----------
