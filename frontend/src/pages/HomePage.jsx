@@ -21,8 +21,8 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:8000/api/communities').then(r => r.json()),
-      fetch('http://localhost:8000/api/stories/recent?limit=8').then(r => r.json()),
+      fetch('/api/communities').then(r => r.json()),
+      fetch('/api/stories/recent?limit=8').then(r => r.json()),
     ]).then(([comms, recent]) => {
       setCommunities(comms)
       setHeroStories(recent)

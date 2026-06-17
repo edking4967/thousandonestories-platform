@@ -21,7 +21,7 @@ export default function NewCommunityPage() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    fetch('http://localhost:8000/api/communities', {
+    fetch('/api/communities', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),

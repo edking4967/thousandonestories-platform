@@ -46,7 +46,7 @@ export default function CommunityPage() {
   const [subscription, setSubscription] = useState(null) // null | { tier: 'free'|'paid' }
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/communities/${id}`)
+    fetch(`/api/communities/${id}`)
       .then(r => {
         if (!r.ok) throw new Error('Not found')
         return r.json()

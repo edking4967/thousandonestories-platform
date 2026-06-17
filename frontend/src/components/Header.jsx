@@ -6,7 +6,7 @@ export default function Header() {
   const location = useLocation()
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/tags')
+    fetch('/api/tags')
       .then(r => r.json())
       .then(data => setTags(data.slice(0, 10))) // cap at 10 tags in nav
       .catch(() => {})

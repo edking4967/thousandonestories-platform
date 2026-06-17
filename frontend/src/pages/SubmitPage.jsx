@@ -18,7 +18,7 @@ export default function SubmitPage() {
   })
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/communities/${id}`)
+    fetch(`/api/communities/${id}`)
       .then(r => {
         if (!r.ok) throw new Error('Not found')
         return r.json()
@@ -41,7 +41,7 @@ export default function SubmitPage() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const res = await fetch('http://localhost:8000/api/submissions', {
+      const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ community_id: id, ...form }),

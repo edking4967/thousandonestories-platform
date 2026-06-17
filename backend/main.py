@@ -6,6 +6,8 @@ from datetime import date
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "thousandone.db")
@@ -465,3 +467,16 @@ def reject_submission(community_id: str, submission_id: str):
     conn.commit()
     conn.close()
     return {"ok": True}
+
+
+# ---------- serve built frontend (must be last) ----------
+
+DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "dist")
+
+if os.path.isdir(DIST_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    def serve_spa(full_path: str):
+        """Catch-all: serve index.html for all non-API routes (React Router)."""
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))

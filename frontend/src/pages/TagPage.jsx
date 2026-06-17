@@ -8,7 +8,7 @@ export default function TagPage() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`http://localhost:8000/api/stories/tag/${encodeURIComponent(tag)}`)
+    fetch(`/api/stories/tag/${encodeURIComponent(tag)}`)
       .then(r => r.json())
       .then(data => { setStories(data); setLoading(false) })
   }, [tag])

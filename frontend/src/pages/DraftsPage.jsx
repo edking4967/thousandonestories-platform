@@ -79,8 +79,8 @@ export default function DraftsPage() {
 
   const fetchDrafts = useCallback(() => {
     const url = filter === 'all'
-      ? 'http://localhost:8000/api/stories/drafts'
-      : `http://localhost:8000/api/stories/drafts?source=${filter}`
+      ? '/api/stories/drafts'
+      : `/api/stories/drafts?source=${filter}`
     fetch(url)
       .then(r => r.json())
       .then(data => { setDrafts(data); setLoading(false) })
@@ -89,7 +89,7 @@ export default function DraftsPage() {
   useEffect(() => { fetchDrafts() }, [fetchDrafts])
 
   function handlePublish(storyId) {
-    return fetch(`http://localhost:8000/api/stories/${storyId}/publish`, { method: 'POST' })
+    return fetch(`/api/stories/${storyId}/publish`, { method: 'POST' })
       .then(() => fetchDrafts())
   }
 

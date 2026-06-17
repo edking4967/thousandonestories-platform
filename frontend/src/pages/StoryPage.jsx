@@ -10,7 +10,7 @@ export default function StoryPage() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/communities/${communityId}`)
+    fetch(`/api/communities/${communityId}`)
       .then(r => {
         if (!r.ok) throw new Error('Not found')
         return r.json()

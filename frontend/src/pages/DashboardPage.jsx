@@ -89,8 +89,8 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(() => {
     Promise.all([
-      fetch(`http://localhost:8000/api/communities/${id}`).then(r => r.json()),
-      fetch(`http://localhost:8000/api/communities/${id}/submissions`).then(r => r.json()),
+      fetch(`/api/communities/${id}`).then(r => r.json()),
+      fetch(`/api/communities/${id}/submissions`).then(r => r.json()),
     ]).then(([comm, subs]) => {
       setCommunity(comm)
       setSubmissions(subs)
@@ -101,12 +101,12 @@ export default function DashboardPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   function handleAccept(submissionId) {
-    return fetch(`http://localhost:8000/api/communities/${id}/submissions/${submissionId}/accept`, { method: 'POST' })
+    return fetch(`/api/communities/${id}/submissions/${submissionId}/accept`, { method: 'POST' })
       .then(() => fetchData())
   }
 
   function handleReject(submissionId) {
-    return fetch(`http://localhost:8000/api/communities/${id}/submissions/${submissionId}/reject`, { method: 'POST' })
+    return fetch(`/api/communities/${id}/submissions/${submissionId}/reject`, { method: 'POST' })
       .then(() => fetchData())
   }
 

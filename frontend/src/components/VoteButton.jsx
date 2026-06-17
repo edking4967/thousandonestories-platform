@@ -7,7 +7,7 @@ export default function VoteButton({ communityId, storyId, initialVotes }) {
 
   function handleVote() {
     if (voted) return
-    fetch(`http://localhost:8000/api/communities/${communityId}/stories/${storyId}/vote`, {
+    fetch(`/api/communities/${communityId}/stories/${storyId}/vote`, {
       method: 'POST',
     })
       .then(r => r.json())
