@@ -21,3 +21,6 @@ frontend/dist/
 
 docs/
 share/
+claude/
+
+log.md

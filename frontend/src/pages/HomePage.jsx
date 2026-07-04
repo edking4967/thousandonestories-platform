@@ -32,8 +32,76 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Full-bleed image mosaic */}
+      {/* Splash */}
       <div style={{
+        width: '100vw',
+        marginLeft: 'calc(50% - 50vw)',
+        background: '#0f1923',
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '80px 48px',
+        boxSizing: 'border-box',
+      }}>
+        {/* Left: headline */}
+        <div style={{ flex: '1 1 55%', paddingRight: '48px' }}>
+          <h1 style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: 'clamp(3rem, 6vw, 5.5rem)',
+            fontWeight: 700,
+            color: '#fff',
+            lineHeight: 0.95,
+            letterSpacing: '-1.5px',
+            margin: 0,
+          }}>
+            find your<br />writing<br />community
+          </h1>
+        </div>
+
+        {/* Right: action links */}
+        <div style={{
+          flex: '0 0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0',
+          borderLeft: '1px solid rgba(255,255,255,0.12)',
+          paddingLeft: '48px',
+        }}>
+          {[
+            { label: 'READ stories',        to: '#communities', anchor: true },
+            { label: 'WRITE a story',       to: '/drafts'                    },
+            { label: 'CREATE A COMMUNITY',  to: '/new-community'             },
+          ].map(({ label, to, anchor }) => {
+            const linkStyle = {
+              display: 'block',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 'clamp(0.9rem, 1.8vw, 1.15rem)',
+              fontWeight: 500,
+              letterSpacing: '0.06em',
+              color: 'rgba(255,255,255,0.75)',
+              textDecoration: 'none',
+              padding: '20px 0',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              transition: 'color 0.2s',
+            }
+            const hoverProps = {
+              onMouseEnter: e => e.currentTarget.style.color = '#fff',
+              onMouseLeave: e => e.currentTarget.style.color = 'rgba(255,255,255,0.75)',
+            }
+            return anchor ? (
+              <a key={label} href={to} style={linkStyle} {...hoverProps} onClick={e => {
+                e.preventDefault()
+                document.getElementById('communities')?.scrollIntoView({ behavior: 'smooth' })
+              }}>{label} →</a>
+            ) : (
+              <Link key={label} to={to} style={linkStyle} {...hoverProps}>{label} →</Link>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Story mosaic */}
+      <div id="communities" style={{
         width: '100vw',
         marginLeft: 'calc(50% - 50vw)',
         height: '85vh',
@@ -48,37 +116,9 @@ export default function HomePage() {
       }}>
         {SLOTS.map((slot, i) => {
           const story = heroStories[i]
-
-          // Empty slot — dark placeholder
           if (!story) {
-            return (
-              <div
-                key={i}
-                style={{ gridColumn: slot.col, gridRow: slot.row, background: '#0f1923' }}
-              />
-            )
+            return <div key={i} style={{ gridColumn: slot.col, gridRow: slot.row, background: '#0f1923' }} />
           }
-
-          const cellContent = story.image_url ? (
-            <img
-              src={story.image_url}
-              alt={story.title}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
-                display: 'block',
-                transition: 'transform 0.35s ease',
-              }}
-            />
-          ) : (
-            <div className="hero-quote-card">
-              <span className="hero-quote-mark">&ldquo;</span>
-              <p className="hero-quote-text">{story.excerpt}</p>
-            </div>
-          )
-
           return (
             <Link
               key={story.id}
@@ -86,56 +126,26 @@ export default function HomePage() {
               style={{ gridColumn: slot.col, gridRow: slot.row, overflow: 'hidden', display: 'block', position: 'relative' }}
               className={`hero-cell${story.image_url ? '' : ' hero-cell--quote'}`}
             >
-              {cellContent}
+              {story.image_url ? (
+                <img src={story.image_url} alt={story.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block', transition: 'transform 0.35s ease' }} />
+              ) : (
+                <div className="hero-quote-card">
+                  <span className="hero-quote-mark">&ldquo;</span>
+                  <p className="hero-quote-text">{story.excerpt}</p>
+                </div>
+              )}
               <div className="hero-cell-label">
                 <span className="hero-cell-title">{story.title}</span>
-                {story.author && (
-                  <span className="hero-cell-author">by {story.author}</span>
-                )}
+                {story.author && <span className="hero-cell-author">by {story.author}</span>}
               </div>
             </Link>
           )
         })}
-
-        {/* Gradient scrim */}
         <div style={{
-          position: 'absolute',
-          inset: 0,
+          position: 'absolute', inset: 0,
           background: 'linear-gradient(to bottom, rgba(10,15,25,0.08) 0%, rgba(10,15,25,0.5) 55%, rgba(10,15,25,0.93) 100%)',
-          pointerEvents: 'none',
-          zIndex: 1,
+          pointerEvents: 'none', zIndex: 1,
         }} />
-
-        {/* Site title */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '0 48px 52px',
-          zIndex: 2,
-        }}>
-          <h1 style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 'clamp(3rem, 6vw, 5.5rem)',
-            fontWeight: 700,
-            color: '#fff',
-            lineHeight: 0.92,
-            letterSpacing: '-1.5px',
-            marginBottom: '14px',
-          }}>
-            thousand<br />one stories
-          </h1>
-          <p style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: '0.73rem',
-            color: 'rgba(255,255,255,0.6)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-          }}>
-            A thousand and one short stories
-          </p>
-        </div>
       </div>
 
       {/* Communities list */}

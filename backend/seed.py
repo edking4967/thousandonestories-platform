@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS communities (
     tagline TEXT NOT NULL,
     description TEXT NOT NULL,
     editor_name TEXT NOT NULL,
-    editor_bio TEXT NOT NULL
+    editor_bio TEXT NOT NULL,
+    hide_authors INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS stories (
@@ -36,7 +37,9 @@ CREATE TABLE IF NOT EXISTS stories (
     date_published TEXT NOT NULL,
     featured INTEGER NOT NULL DEFAULT 0,
     votes INTEGER NOT NULL DEFAULT 0,
-    image_url TEXT
+    image_url TEXT,
+    status TEXT NOT NULL DEFAULT 'published',
+    tags TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS submissions (
