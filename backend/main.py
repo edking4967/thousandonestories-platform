@@ -475,6 +475,9 @@ DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "front
 
 if os.path.isdir(DIST_DIR):
     app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
+    images_dir = os.path.join(DIST_DIR, "images")
+    if os.path.isdir(images_dir):
+        app.mount("/images", StaticFiles(directory=images_dir), name="images")
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str):
