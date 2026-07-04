@@ -18,15 +18,26 @@ export default function CommunityCard({ community }) {
 
       {/* Featured story */}
       {featured_story && (
-        <div style={{ marginBottom: '14px' }}>
-          <Link to={`/c/${id}`}>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', fontWeight: 700, color: '#0f1923', lineHeight: 1.25, marginBottom: '6px' }}>
-              {featured_story.title}
-            </h2>
-          </Link>
-          <p style={{ fontSize: '13px', color: '#374151', lineHeight: 1.6, fontWeight: 300 }}>
-            {featured_story.excerpt}
-          </p>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginBottom: '14px' }}>
+          <div style={{ flex: 1 }}>
+            <Link to={`/c/${id}`}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', fontWeight: 700, color: '#0f1923', lineHeight: 1.25, marginBottom: '6px' }}>
+                {featured_story.title}
+              </h2>
+            </Link>
+            <p style={{ fontSize: '13px', color: '#374151', lineHeight: 1.6, fontWeight: 300 }}>
+              {featured_story.excerpt}
+            </p>
+          </div>
+          {featured_story.image_url && (
+            <Link to={`/c/${id}`} style={{ flexShrink: 0 }}>
+              <img
+                src={featured_story.image_url}
+                alt={featured_story.title}
+                style={{ width: '120px', height: '80px', objectFit: 'cover', display: 'block' }}
+              />
+            </Link>
+          )}
         </div>
       )}
 
